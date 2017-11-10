@@ -1,0 +1,9 @@
+VERTEX mesh_vertex
+    ATTRIBUTE iPos float3
+    ATTRIBUTE iNorm float3
+    ATTRIBUTE iTex float2
+
+VERTEX sprite_vertex
+    ATTRIBUTE iPos float2
+    ATTRIBUTE iTex float2
+    ATTRIBUTE iCol float4
