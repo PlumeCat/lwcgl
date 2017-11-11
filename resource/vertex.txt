@@ -3,7 +3,19 @@ VERTEX mesh_vertex
     ATTRIBUTE iNorm float3
     ATTRIBUTE iTex float2
 
+VERTEX animated_mesh_vertex
+    ATTRIBUTE iPos float3
+    ATTRIBUTE iNorm float3
+    ATTRIBUTE iTex float2
+    ATTRIBUTE iBoneIndices ubyte4
+    ATTRIBUTE iBoneWeights ubyte4n
+
+VERTEX billboard_vertex
+    ATTRIBUTE iPos float2
+    ATTRIBUTE iTex ushort2n
+    ATTRIBUTE iCol ubyte4n
+
 VERTEX sprite_vertex
     ATTRIBUTE iPos float2
     ATTRIBUTE iTex float2
-    ATTRIBUTE iCol float4
+    ATTRIBUTE iCol ubyte4n

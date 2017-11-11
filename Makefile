@@ -14,8 +14,8 @@ CLANG_ARGS =-Wall \
 			-arch i386 \
 			-std=c++14
 
-build_main: src/main.cpp
-	clang++ src/main.cpp -o cubes $(CLANG_ARGS) $(INCLUDE) $(LIBS)
+build_debug: src/main.cpp
+	clang++ src/main.cpp -o build/cubes $(CLANG_ARGS) $(INCLUDE) $(LIBS) -DRESOURCE_BASE="string(\"resource\")"
 
-run: build_main
-	./cubes
+debug: build_debug
+	./build/cubes

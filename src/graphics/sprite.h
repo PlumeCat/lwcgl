@@ -42,8 +42,8 @@ public:
         vector<VertexAttr> attrs;
         getVertexAttrs(attrs);
 
-        defaultShader = shaders->getShader("spritevs.glsl", "spriteps.glsl", attrs);
-        fontShader = shaders->getShader("spritevs.glsl", "fontps.glsl", attrs);
+        defaultShader = shaders->getShader("spritevs.glsl", "spriteps.glsl");
+        fontShader = shaders->getShader("spritevs.glsl", "fontps.glsl");
 
         posBuf = new Buffer();
         texBuf = new Buffer();

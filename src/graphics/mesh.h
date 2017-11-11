@@ -94,12 +94,11 @@ class MeshBuilder
     vector<float2> texcoords;
     vector<ushort> indices;
     vector<MeshSubset> subsets;
-    vector<VertexAttr>& vertexAttrs;
 
 public:
-    MeshBuilder(const vector<VertexAttr>& attrs)
+    void begin()
     {
-        vertexAttrs = attrs;
+        clear();
     }
     void addGeometry(const float3* vert, const float3* norm, const float2* tex, const ushort* ind, int numvert, int numind, int materialId=0)
     {
@@ -237,14 +236,14 @@ public:
 
 		addGeometry(vert, norm, tex, ind, 24, 36, materialId);
     }
-    Mesh* end()
+    Mesh* end(const vector<VertexAttr>& attrs)
     {
         Mesh* mesh = new Mesh();
         mesh->posBuf = new Buffer(&vertices[0], sizeof(float3)*vertices.size());
         mesh->normalBuf = new Buffer(&normals[0], sizeof(float3)*normals.size());
         mesh->texBuf = new Buffer(&texcoords[0], sizeof(float2)*texcoords.size());
         mesh->indexBuf = new Buffer(&indices[0], sizeof(ushort)*indices.size(), true);
-        mesh->array = new VertexArray(vertexAttrs, { mesh->posBuf, mesh->normalBuf, mesh->texBuf }, mesh->indexBuf);
+        mesh->array = new VertexArray(attrs, { mesh->posBuf, mesh->normalBuf, mesh->texBuf }, mesh->indexBuf);
         mesh->subsets = subsets;
         
         return mesh;

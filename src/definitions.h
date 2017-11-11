@@ -31,14 +31,21 @@ string readTextFile(const string& fname)
     }
     return source;
 }
-void readTextFile(const string& fname, vector<string>& lines)
+bool readTextFile(const string& fname, vector<string>& lines)
 {
     ifstream file(fname);
+    if (!file.is_open())
+    {
+        return false;
+    }
+
     string line;
     while (getline(file, line))
     {
         lines.push_back(line);
     }
+
+    return true;
 }
 
 void split(const string& str, char c, vector<string>& tokens)
@@ -79,5 +86,9 @@ string strip(const string& str)
     return string(str.begin() + first, str.begin() + last + 1);
 }
 
+
+#ifndef RESOURCE_BASE
+#define RESOURCE_BASE "resource"
+#endif
 
 #endif

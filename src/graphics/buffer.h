@@ -4,20 +4,21 @@
 struct VertexAttr
 {
     string name;
-    int bindPos;
-    int bindCount;
-    int glType;
-    bool normalized;
-    int stride;
-    void* offset;
+    string shaderType;
+    int bindPos = 0;
+    int bindCount = 1;
+    int glType = GL_FLOAT;
+    int normalized = GL_FALSE;
+    int stride = 0;
+    void* offset = nullptr;
 
     VertexAttr(const string& _name,
                 int _bindpos,
                 int _bindcount,
                 int _gltype,
-                bool _normalize,
-                int _stride,
-                void* _offset):
+                int _normalize,
+                int _stride=0,
+                void* _offset=nullptr):
         name(_name),
         bindPos(_bindpos),
         bindCount(_bindcount),
@@ -25,6 +26,56 @@ struct VertexAttr
         normalized(_normalize),
         stride(_stride),
         offset(_offset) {}
+    VertexAttr(const string& _name, const string& _decl, int _bindpos):
+        name(_name),
+        stride(0),
+        offset(nullptr)
+    {
+        // _decl must be one of
+        // 
+        //      [u]byte[2,3,4][n]
+        //      [u]short[2,3,4][n]
+        //      [u]int[2,3,4][n]
+        //      half[2,3,4]
+        //      float[2,3,4]
+        //      double[2,3,4]
+        // 
+        // we will quickly parse it to fill out (bindCount, normalized, glType)
+        
+        // find the first digit
+        auto digit = _decl.find_first_of("234");
+
+        // decide bind count and normalized
+        bindCount = (digit == string::npos) ? 1 : stoi(_decl.substr(digit, 1));
+        normalized = (_decl[_decl.length()-1] == 'n') ? GL_TRUE : GL_FALSE;
+        
+        // decide input type ("gltype")
+        string format = _decl.substr(0, min(normalized ? _decl.size()-1 : _decl.size(), digit));
+        if (format == "byte")        { glType = GL_BYTE; }
+        else if (format  == "ubyte") { glType = GL_UNSIGNED_BYTE; }
+        else if (format == "short")  { glType = GL_SHORT; }
+        else if (format == "ushort") { glType = GL_UNSIGNED_SHORT; }
+        else if (format == "int")    { glType = GL_INT; }
+        else if (format == "uint")   { glType = GL_UNSIGNED_INT; }
+        else if (format == "half")   { glType = GL_HALF_FLOAT; }
+        else if (format == "float")  { glType = GL_FLOAT; }
+        else if (format == "double") { glType = GL_DOUBLE; }
+        else { glType = GL_FLOAT; }
+
+        // decide shader type
+        shaderType += (normalized || glType == GL_DOUBLE || glType == GL_FLOAT || glType == GL_HALF_FLOAT) ? 
+            ((glType == GL_DOUBLE) ? 
+                ((bindCount > 1) ? "dvec"+to_string(bindCount) : "double"):
+                ((bindCount > 1) ? "vec"+to_string(bindCount) : "float")):
+            ((glType == GL_INT || glType == GL_SHORT || glType == GL_BYTE) ? 
+                ((bindCount > 1) ? "ivec"+to_string(bindCount) : "int"):
+                ((bindCount > 1) ? "uvec"+to_string(bindCount) : "uint"));
+
+    }
+    string getShaderDecl()
+    {
+        return "in " + shaderType + " " + name + ";";
+    }
 };
 
 struct Buffer

@@ -2,6 +2,7 @@
 #define _CUBE_TEXTURE_H
 
 #include <SOIL.h>
+#include "../definitions.h"
 
 struct Texture
 {
@@ -75,7 +76,7 @@ class TextureManager
     }
 
 public:
-    TextureManager(const string& dir = "resource/textures", const string& fdir = "resource/fonts") : baseDir(dir), fontDir(fdir) {}
+    TextureManager(const string& dir=string(RESOURCE_BASE)+"/textures", const string& fdir=string(RESOURCE_BASE)+"/fonts") : baseDir(dir), fontDir(fdir) {}
     Texture* getTexture(const string& fname)
     {
         cout << "loading texture" << fname << endl;

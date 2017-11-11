@@ -1,5 +1,3 @@
-// blockps.glsl
-
 #version 400
 
 in vec2 vTex;
@@ -10,6 +8,5 @@ uniform sampler2D diffuseMap;
 
 void main()
 {
-    vec4 tex = texture(diffuseMap, vTex);
-    oCol = vCol * tex;
+    oCol = vCol * texture(diffuseMap, vTex);
 }

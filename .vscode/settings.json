@@ -9,6 +9,7 @@
         "algorithm": "cpp",
         "bitset": "cpp",
         "chrono": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "typeinfo": "cpp"
     }
 }

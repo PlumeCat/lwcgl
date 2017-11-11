@@ -33,12 +33,13 @@ class CubeGame : public Game
         camera.position = float3(10, 10, 10);
         camera.target = float3(0, 0, 0);
         camera.up = float3(0, 1, 0);
+        camera.update();
 
         shader = shaders->getShader("cubevs.glsl", "cubeps.glsl");
 
-        MeshBuilder builder(shaders->getVertexAttrs("mesh_vertex"));
+        MeshBuilder builder;
         builder.addBox({-1, -1, -1}, {1, 1, 1}, {0, 0}, {1, 1}, 0);
-        mesh = builder.end();
+        mesh = builder.end(shaders->getVertexAttrs("mesh_vertex"));
     }
     void update()
     {
@@ -46,7 +47,17 @@ class CubeGame : public Game
     }
     void render()
     {
+        glClearColor(0.25, 0.4, 0.8, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        matrix transform = matrix::identity();
+
+        shader->bind();
+        shader->set("World", transform);
+        shader->set("View", camera.view);
+        shader->set("Proj", camera.proj);
+        mesh->render();
     }
     void close()
     {
