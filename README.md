@@ -11,7 +11,7 @@ lightweight C++ game library
 
 ### done but not yet integrated
 - terrain rendering
-- mesh loading from OBJ
+- mesh loading from **OBJ**
 - tool for creating new fonts
 
 ### coming soon
