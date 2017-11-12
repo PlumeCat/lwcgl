@@ -22,10 +22,10 @@ struct Texture
 struct SpriteChar
 {
     char ch;
-    int left;
-    int top;
-    int width;
-    int height;
+    float left;
+    float top;
+    float width;
+    float height;
 };
 struct SpriteFont
 {
@@ -153,21 +153,17 @@ public:
                 }
             }
 
-            // int ch = atoi(values[0].c_str());
-            // int code = atoi(values[1].c_str());
-            // chars[code].ch = code;
+            int ch = atoi(values[0].c_str());
+            int code = atoi(values[1].c_str());
+            chars[code].ch = code;
+            stringstream(values[2]) >> chars[code].left;
+            stringstream(values[3]) >> chars[code].top;
+            stringstream(values[4]) >> chars[code].width;
+            stringstream(values[5]) >> chars[code].height;
             // chars[code].left   = atoi(values[2].c_str());
             // chars[code].top    = atoi(values[3].c_str());
             // chars[code].width  = atoi(values[4].c_str());
             // chars[code].height = atoi(values[5].c_str());
-
-            // cout << line << endl;
-            // cout << chars[code].ch << ": " <<
-            //         chars[code].left << ", " <<
-            //         chars[code].top << ", " <<
-            //         chars[code].width << ", " <<
-            //         chars[code].height <<
-            //         endl;
         }
 
         cout << "success" << endl;

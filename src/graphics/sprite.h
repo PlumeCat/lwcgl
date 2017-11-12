@@ -30,26 +30,16 @@ public:
     Sprite(const Sprite&) = delete;
     Sprite& operator = (const Sprite&) = delete;
 
-    void getVertexAttrs(vector<VertexAttr>& attrs)
-    {
-        attrs.push_back(VertexAttr("iPos", 0, 2, GL_FLOAT, false, 0, nullptr));
-        attrs.push_back(VertexAttr("iTex", 1, 2, GL_FLOAT, false, 0, nullptr));
-        attrs.push_back(VertexAttr("iCol", 2, 4, GL_FLOAT, false, 0, nullptr));
-    }
-
     Sprite(ShaderManager* shaders)
     {
-        vector<VertexAttr> attrs;
-        getVertexAttrs(attrs);
-
-        defaultShader = shaders->getShader("spritevs.glsl", "spriteps.glsl");
         fontShader = shaders->getShader("spritevs.glsl", "fontps.glsl");
+        defaultShader = shaders->getShader("spritevs.glsl", "spriteps.glsl");
 
         posBuf = new Buffer();
         texBuf = new Buffer();
         colBuf = new Buffer();
         indexBuf = new Buffer(nullptr, 0, true);
-        array = new VertexArray(attrs, { posBuf, texBuf, colBuf }, indexBuf);
+        array = new VertexArray(shaders->getVertexAttrs("sprite_vertex"), { posBuf, texBuf, colBuf }, indexBuf);
     }
     ~Sprite()
     {

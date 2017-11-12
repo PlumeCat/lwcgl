@@ -70,7 +70,6 @@ class ShaderManager
         // attach vertex attributes
         for (auto& a : attrs)
         {
-            cout << a.name << " - " << a.bindPos << endl;
             glBindAttribLocation(program, a.bindPos, a.name.c_str());
         }
 

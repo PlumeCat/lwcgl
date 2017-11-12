@@ -13,6 +13,8 @@
         "typeinfo": "cpp",
         "__split_buffer": "cpp",
         "string": "cpp",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "__tree": "cpp",
+        "initializer_list": "cpp"
     }
 }

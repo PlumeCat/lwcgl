@@ -9,4 +9,7 @@ uniform sampler2D diffuseMap;
 void main()
 {
     oCol = vCol * texture(diffuseMap, vTex);
+
+    oCol.r = vTex.x;
+    oCol.g = vTex.y;
 }

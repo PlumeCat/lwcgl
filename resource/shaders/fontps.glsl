@@ -9,7 +9,9 @@ uniform sampler2D diffuseMap;
 void main()
 {
     vec4 samp = texture(diffuseMap, vTex);
-    if (samp.r < 0.075)
+
+    if (samp.r < 0.25)
         discard;
-    oCol = vCol * samp * 2;
+
+    oCol.rgba = samp.rgbr;
 }

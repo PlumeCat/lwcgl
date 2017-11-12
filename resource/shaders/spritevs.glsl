@@ -1,8 +1,6 @@
+// spritevs.glsl
 #version 400
-
-in vec2 iPos;
-in vec2 iTex;
-in vec4 iCol;
+#vertex sprite_vertex
 
 out vec2 vTex;
 out vec4 vCol;

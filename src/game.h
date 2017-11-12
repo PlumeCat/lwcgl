@@ -81,7 +81,7 @@ class Game
         cout << "Shader: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        glDisable(GL_CULL_FACE);
         glDepthFunc(GL_LESS);
 
         return 1;

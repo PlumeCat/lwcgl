@@ -7,46 +7,13 @@
             "label": "Make OSX",
             "type": "shell",
             "command": "make",
-            "args": [ "build_debug" ]
-        },
-        {
-            "label": "Build OSX",
-            "type": "shell",
-            "command": "clang++",
             "args": [
-                
-                // input
-                "src/main.cpp",
-                
-                // output
-                "-o","build/cubes",
-                
-                // definitions
-                "-DRESOURCE_BASE=string(\"resource\")",
-                
-                // libs
-                "-L./",
-                "-L/usr/local/lib",
-                "-lglfw",
-                "-lSOI",
-                "-lGLEW",
-                
-                // frameworks
-                "-fms-extensions",
-                "-framework","Cocoa",
-                "-framework","OpenGL",
-                "-framework","IOKit",
-                "-framework","CoreVideo",
-                
-                // include
-                "-I/usr/local/include",
-                
-                "-Wall", // warnings
-                "-m32", // word size?
-                "-g", // debug symbols
-                "-arch","i386", // architecture x86?
-                "-std=c++14" // use c++14
-            ]
+                "build_debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
