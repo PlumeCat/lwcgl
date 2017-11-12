@@ -134,6 +134,33 @@ public:
     virtual void render() = 0;
     virtual void close() = 0;
 
+    void logGlError()
+    {
+        while (true)
+        {
+            auto err = glGetError();
+            if (err)
+            {
+                string msg;
+                switch (err)
+                {
+                    case GL_INVALID_ENUM: msg = "invalid enum"; break;
+                    case GL_INVALID_VALUE: msg = "invalid value"; break;
+                    case GL_INVALID_OPERATION: msg = "invalid operation"; break;
+                    case GL_INVALID_FRAMEBUFFER_OPERATION: msg = "invalid fbo op"; break;
+                    case GL_OUT_OF_MEMORY: msg = "oom"; break;
+                    case GL_STACK_OVERFLOW: msg = "stackoverflow"; break;
+                    case GL_STACK_UNDERFLOW: msg = "stack underflow"; break;
+                }
+                cout << "get error: " << msg << endl;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
     int run()
     {
         if (!initWindow())
@@ -153,14 +180,23 @@ public:
         meshes = new MeshManager();
 
         init();
+        logGlError();
+        cout << "starting main loop" << endl;
 
         while (!glfwWindowShouldClose(window) && !shouldExit)
         {
             input.update();
             update();
 
+            glClearColor(0.25, 0.4, 0.8, 0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             render();
+            
             glfwSwapBuffers(window);
+
+            logGlError();
+
         }
 
         close();

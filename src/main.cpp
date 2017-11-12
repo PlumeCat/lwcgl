@@ -27,6 +27,7 @@ class CubeGame : public Game
     Camera camera;
     Mesh* mesh;
     Shader* shader;
+    float f = 0;
 
     void init()
     {
@@ -47,11 +48,8 @@ class CubeGame : public Game
     }
     void render()
     {
-        glClearColor(0.25, 0.4, 0.8, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        matrix transform = matrix::identity();
+        f += 0.01;
+        matrix transform = matrix::rotateZ(f);
 
         shader->bind();
         shader->set("World", transform);

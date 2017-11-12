@@ -44,7 +44,8 @@ struct Mesh
         }
         array->unbind();
     }
-    void render(SubsetRenderCallback callback)
+    template<typename Callback>
+    void render(Callback callback)
     {
         array->bind();
         for (auto& s : subsets)
@@ -65,7 +66,8 @@ struct Mesh
         }
         array->unbind();
     }
-    void renderInstanced(int numInstances, SubsetRenderCallback callback)
+    template<typename Callback>
+    void renderInstanced(int numInstances, Callback callback)
     {
         array->bind();
         for (auto& s : subsets)

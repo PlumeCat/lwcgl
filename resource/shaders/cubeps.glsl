@@ -11,5 +11,6 @@ uniform sampler2D diffuseMap;
 void main()
 {
     vec4 tex = texture(diffuseMap, vTex);
-    oCol = vCol * tex;
+    oCol = vCol;
+    // oCol *= tex;
 }

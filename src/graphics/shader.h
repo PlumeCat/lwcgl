@@ -70,6 +70,7 @@ class ShaderManager
         // attach vertex attributes
         for (auto& a : attrs)
         {
+            cout << a.name << " - " << a.bindPos << endl;
             glBindAttribLocation(program, a.bindPos, a.name.c_str());
         }
 
@@ -125,7 +126,7 @@ class ShaderManager
                     throw runtime_error("error parsing attribute file: '" + l + "'");
                 }
                 
-                auto attr = VertexAttr(tokens[1], tokens[2], vertexTypes[currentVertexName].size()-1);
+                auto attr = VertexAttr(tokens[1], tokens[2], vertexTypes[currentVertexName].size());
                 cout << "    " << currentVertexName << " attribute: " << attr.name << " " << attr.bindPos << " " << attr.bindCount << " " << attr.glType << " " << attr.shaderType << endl;
                 vertexTypes[currentVertexName].push_back(attr);
 

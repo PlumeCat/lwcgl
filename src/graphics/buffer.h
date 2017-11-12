@@ -11,6 +11,21 @@ struct VertexAttr
     int normalized = GL_FALSE;
     int stride = 0;
     void* offset = nullptr;
+    
+    static string getShaderType(int _normalized, int _glType, int _bindCount)
+    {
+        return (_normalized || _glType == GL_DOUBLE || _glType == GL_FLOAT || _glType == GL_HALF_FLOAT) ? 
+            ((_glType == GL_DOUBLE) ? 
+                ((_bindCount > 1) ? "dvec"+to_string(_bindCount) : "double"):
+                ((_bindCount > 1) ? "vec"+to_string(_bindCount) : "float")):
+            ((_glType == GL_INT || _glType == GL_SHORT || _glType == GL_BYTE) ? 
+                ((_bindCount > 1) ? "ivec"+to_string(_bindCount) : "int"):
+                ((_bindCount > 1) ? "uvec"+to_string(_bindCount) : "uint"));
+    }
+    static int getNormalization(const string& decl)
+    {
+        return (decl[decl.length()-1] == 'n') ? GL_TRUE : GL_FALSE;
+    }
 
     VertexAttr(const string& _name,
                 int _bindpos,
@@ -25,10 +40,13 @@ struct VertexAttr
         glType(_gltype),
         normalized(_normalize),
         stride(_stride),
-        offset(_offset) {}
+        offset(_offset),
+        shaderType(getShaderType(_normalize, _gltype, _bindcount))
+        {}
     VertexAttr(const string& _name, const string& _decl, int _bindpos):
         name(_name),
         stride(0),
+        bindPos(_bindpos),
         offset(nullptr)
     {
         // _decl must be one of
@@ -40,14 +58,14 @@ struct VertexAttr
         //      float[2,3,4]
         //      double[2,3,4]
         // 
-        // we will quickly parse it to fill out (bindCount, normalized, glType)
+        // we will quickly parse it to fill out (normalized, bindCount, glType)
+        normalized = getNormalization(_decl);
         
         // find the first digit
         auto digit = _decl.find_first_of("234");
 
         // decide bind count and normalized
         bindCount = (digit == string::npos) ? 1 : stoi(_decl.substr(digit, 1));
-        normalized = (_decl[_decl.length()-1] == 'n') ? GL_TRUE : GL_FALSE;
         
         // decide input type ("gltype")
         string format = _decl.substr(0, min(normalized ? _decl.size()-1 : _decl.size(), digit));
@@ -63,13 +81,7 @@ struct VertexAttr
         else { glType = GL_FLOAT; }
 
         // decide shader type
-        shaderType += (normalized || glType == GL_DOUBLE || glType == GL_FLOAT || glType == GL_HALF_FLOAT) ? 
-            ((glType == GL_DOUBLE) ? 
-                ((bindCount > 1) ? "dvec"+to_string(bindCount) : "double"):
-                ((bindCount > 1) ? "vec"+to_string(bindCount) : "float")):
-            ((glType == GL_INT || glType == GL_SHORT || glType == GL_BYTE) ? 
-                ((bindCount > 1) ? "ivec"+to_string(bindCount) : "int"):
-                ((bindCount > 1) ? "uvec"+to_string(bindCount) : "uint"));
+        shaderType = getShaderType(normalized, glType, bindCount);
 
     }
     string getShaderDecl()
