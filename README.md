@@ -16,15 +16,16 @@ lightweight C++ game library
 
 ### coming soon
 - sound
-- DirectX rendering backend
-- collisions / Bullet physics
+- **DirectX** rendering backend
+- **Lua** scripting
+- collisions / **Bullet** physics
 - `GameScreen` and `GameObject` system
 - component system
-- mesh loading from DAE
+- mesh loading from **DAE**
 - animated meshes /skeletons
 - billboards, particles
 - networking / multiplayer
-    + Node.JS server listing/matchmaking system
+    + **Node.JS** listing/matchmaking system
 
 ### cube game
 
