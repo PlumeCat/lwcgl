@@ -49,7 +49,7 @@ class CubeGame : public Game
     void render()
     {
         f += 0.01;
-        matrix transform = matrix::rotateZ(f);
+        auto transform = matrix::identity();
 
         shader->bind();
         shader->set("World", transform);

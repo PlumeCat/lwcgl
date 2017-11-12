@@ -12,10 +12,15 @@ INCLUDE = 	-I/usr/local/include
 CLANG_ARGS =-Wall \
 			-m32 \
 			-arch i386 \
-			-std=c++14
+			-std=c++14 \
+			-g
 
-build_debug: src/main.cpp
-	clang++ src/main.cpp -o build/cubes $(CLANG_ARGS) $(INCLUDE) $(LIBS) -DRESOURCE_BASE="string(\"resource\")"
+clean:
+	rm -r build/debug
+	mkdir build/debug
+
+build_debug: clean src/main.cpp
+	clang++ src/main.cpp -o build/debug/cubes $(CLANG_ARGS) $(INCLUDE) $(LIBS) -DRESOURCE_BASE="string(\"resource\")"
 
 debug: build_debug
-	./build/cubes
+	./build/debug/cubes

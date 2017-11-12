@@ -12,6 +12,7 @@
         "map": "cpp",
         "typeinfo": "cpp",
         "__split_buffer": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "stdexcept": "cpp"
     }
 }
