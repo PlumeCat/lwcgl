@@ -6,4 +6,4 @@ lightweight C++ game library
 
 quick sample that shows how to derive `Game` and add your own gameplay
 
-![alt text](https://github.com/jamesmjdm/cube/screeny.png)
+![image not found :(](https://github.com/jamesmjdm/lwcgl/blob/master/screeny.png)
