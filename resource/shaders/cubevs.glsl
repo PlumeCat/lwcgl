@@ -18,6 +18,6 @@ void main()
     vec4 pos = Proj * View * World * vec4(iPos, 1);
 
     vTex = iTex;
-    vCol = Colour * d;
+    vCol = Colour * vec4(d,d,d,1);
     gl_Position = pos;
 }

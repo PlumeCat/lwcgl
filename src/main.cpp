@@ -52,11 +52,12 @@ class CubeGame : public Game
     vector<float3> cubes;
     float3 player;
     float cubeSpeed = 0.5;
-    float cameraTilt = 0;
+    float tilt = 0;
+    int score = 0;
 
     void spawnCube()
     {
-        cubes.push_back(float3(player.x + uniform(-20, 20), 0, 45));
+        cubes.push_back(float3(player.x + uniform(-20, 20), 0, 99));
     }
 
     void init()
@@ -74,11 +75,6 @@ class CubeGame : public Game
         mesh = builder.end(shaders->getVertexAttrs("mesh_vertex"));
 
         sprite = new Sprite(shaders);
-
-        // set up player
-        player.x = 0;
-        player.y = 0;
-        player.z = 0;
 
         spawnCube();
         spawnCube();
@@ -106,6 +102,26 @@ class CubeGame : public Game
         {
             spawnCube();
         }
+
+        // update player
+        score++;
+        if (input.keyDown(GLFW_KEY_RIGHT))
+        {
+            tilt += (0.15 - tilt) / 20.f;
+            player.x -= 0.24;
+        }
+        if (input.keyDown(GLFW_KEY_LEFT))
+        {
+            tilt += (-0.15 - tilt) / 20.f;
+            player.x += 0.24;
+        }
+        tilt -= tilt / 20.f;
+
+        // update camera
+        camera.up = float3(sin(tilt), cos(tilt), 0);
+        camera.target = player + camera.up * 5.f;
+        camera.position = player + float3(0, 0, -20) + camera.up * 10.f;
+        camera.update();
     }
     void render()
     {
@@ -117,24 +133,40 @@ class CubeGame : public Game
 
         // draw floor
         shader->set("Colour", float4(0.6, 0.6, 0.6, 1));
-        shader->set("World", matrix::translation(0, -1, 0) * matrix::scale(100, 1, 100));
+        shader->set("World", matrix::translation(0, -1, 0) * matrix::scale(200, 1, 200));
         mesh->render();
+
+        matrix shadow = {{
+            1, 0, 0, 0,
+            -1.5, 0, -0.5, 0,
+            0, 0, 1, 0,
+            0, 0.01, 0, 1,
+        }};
         
         // draw player
         shader->set("Colour", float4(1, 0, 0, 1));
         shader->set("World", matrix::translation(player));
         mesh->render();
+        shader->set("Colour", float4(0, 0, 0, 0.25));
+        shader->set("World", shadow * matrix::translation(player));
+        mesh->render();
 
         // draw cubes
-        shader->set("Colour", float4(0.4, 0.7, 0.3, 1));
         for (auto& c : cubes)
         {
             shader->set("World", matrix::translation(c));
+            shader->set("Colour", float4(0.4, 0.7, 0.3, 1));
+            mesh->render();
+
+            shader->set("World", matrix::translation(c+float3(0, 0.1, 0)) * shadow);
+            shader->set("Colour", float4(0,0,0,0.25));
             mesh->render();
         }
 
-        sprite->drawText(font, "Score: 0", {-635, 320});
-        sprite->drawText(font, (stringstream("Speed: ") << cubeSpeed).str(), {-635, 280});
+        stringstream scorestr;
+        scorestr << "Score: " << score;
+
+        sprite->drawText(font, scorestr.str(), {-635, 320});
         
         sprite->begin(font->texture->texture);
         sprite->addSprite({0, 0}, {100, 100});
