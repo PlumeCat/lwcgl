@@ -74,8 +74,8 @@ class ShaderManager
         }
 
         glLinkProgram(program);
-        glDetachShader(program, vs);
-        glDetachShader(program, ps);
+        // glDetachShader(program, vs);
+        // glDetachShader(program, ps);
 
         return program;
     }
@@ -310,6 +310,7 @@ public:
         else
         {
             vshader = vsiter->second.shader;
+            vertexDef = vsiter->second.vertexDef;
         }
 
         // load pixel shader or use cached

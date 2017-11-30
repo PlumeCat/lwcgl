@@ -5,12 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "LLDB Launch + Debug",
             "type": "cppdbg",
             "request": "launch",
-            "name": "Debug C++ (clang + lldb)",
             "program": "${workspaceRoot}/build/debug/cubes",
+            "args": [],
+            "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
-            "MIMode": "lldb"
+            "environment": [],
+            "MIMode": "lldb",
+            "preLaunchTask": "OSX Build Debug",
+            "internalConsoleOptions": "openOnSessionStart"
         }
     ]
 }

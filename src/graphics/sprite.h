@@ -32,8 +32,8 @@ public:
 
     Sprite(ShaderManager* shaders)
     {
-        fontShader = shaders->getShader("spritevs.glsl", "fontps.glsl");
         defaultShader = shaders->getShader("spritevs.glsl", "spriteps.glsl");
+        fontShader = shaders->getShader("spritevs.glsl", "fontps.glsl");
 
         posBuf = new Buffer();
         texBuf = new Buffer();
@@ -49,7 +49,7 @@ public:
         delete indexBuf;
         delete array;
     }
-    void drawText(SpriteFont* font, const string& text, const float2& pos, const float2& scale={1,1}, Shader* shader=nullptr)
+    void drawText(SpriteFont* font, const string& text, const float2& pos, const float2& scale={1,1}, const float4& color={1,1,1,1}, Shader* shader=nullptr)
     {
         begin(font->texture->texture, fontShader);
 
@@ -60,8 +60,8 @@ public:
             char c = text[i];
 
             // handle these characters specially
-            if (c == ' ') { offset.x += font->chars[(uint)'a'].width; continue; }
-            if (c == '\t') { offset.x += font->chars[(uint)'a'].width*4; continue; }
+            if (c == ' ') { offset.x += font->chars[(uint)'.'].width; continue; }
+            if (c == '\t') { offset.x += font->chars[(uint)'.'].width*4; continue; }
             if (c == '\n') { offset.x = pos.x; offset.y -= font->chars[(uint)'a'].height; continue; }
 
             // skip unrenderable characters
@@ -72,7 +72,7 @@ public:
             float2 tmn((float)ch.left/(float)font->texture->width, 1-(float)(ch.top+ch.height)/(float)font->texture->height);
             float2 tmx((float)(ch.left+ch.width)/(float)font->texture->width, 1-(float)(ch.top)/(float)font->texture->height);
 
-            addSprite(pos+offset*scale, float2(ch.width, ch.height)*scale, {1,1,1,1}, tmn, tmx);
+            addSprite(pos+offset*scale, float2(ch.width, ch.height)*scale, color, tmn, tmx);
 
             offset.x += ch.width;
         }
@@ -93,10 +93,10 @@ public:
         vertices[numQuads * 4 + 2] = pos + float2(0,size.y);
         vertices[numQuads * 4 + 3] = pos + size;
 
-        texcoords[numQuads * 4 + 0] = { tmin.x, tmin.y };
-        texcoords[numQuads * 4 + 1] = { tmax.x, tmin.y };
-        texcoords[numQuads * 4 + 2] = { tmin.x, tmax.y };
-        texcoords[numQuads * 4 + 3] = { tmax.x, tmax.y };
+        texcoords[numQuads * 4 + 0] = { tmin.x, tmax.y };
+        texcoords[numQuads * 4 + 1] = { tmax.x, tmax.y };
+        texcoords[numQuads * 4 + 2] = { tmin.x, tmin.y };
+        texcoords[numQuads * 4 + 3] = { tmax.x, tmin.y };
 
         colours[numQuads * 4 + 0] = col;
         colours[numQuads * 4 + 1] = col;
@@ -118,7 +118,7 @@ public:
         glGetIntegerv(GL_VIEWPORT, dims);
 
         matrix view = matrix::lookAt(float3(0, 0, 100), float3(0, 0, 0), float3(0, 1, 0));
-        matrix proj = matrix::ortho(dims[2], dims[3], 1, 1024);
+        matrix proj = matrix::ortho(0, dims[2], dims[3], 0, 1, 1024);
 
         currentShader->setTexture2D("diffuseMap", texture);
         currentShader->set("View", view);

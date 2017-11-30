@@ -13,9 +13,9 @@ VERTEX animated_mesh_vertex
 VERTEX billboard_vertex
     ATTRIBUTE iPos float2
     ATTRIBUTE iTex ushort2n
-    ATTRIBUTE iCol ubyte4n
+    ATTRIBUTE iCol float4
 
 VERTEX sprite_vertex
     ATTRIBUTE iPos float2
     ATTRIBUTE iTex float2
-    ATTRIBUTE iCol ubyte4n
+    ATTRIBUTE iCol float4

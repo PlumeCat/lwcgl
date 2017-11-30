@@ -411,6 +411,23 @@ struct matrix
             0,  0,  zb, 1,
         }};
     }
+    static matrix ortho(float l, float r, float t, float b, float zn, float zf)
+    {
+        float d = zf - zn;
+        float zb = -(zn + zf) / d;
+        float x = l + r;
+        float y = t + b;
+
+        float w = l - r;
+        float h = t - b;
+
+        return {{
+            -2/w, 0, 0, 0,
+            0, -2/h, 0, 0,
+            0, 0, 1/d, 0,
+            x/w, y/h, zn/d, 1
+        }};
+    }
     static matrix perspective(float angle, float aspect, float zn, float zf)
     {
         float d = zf - zn;

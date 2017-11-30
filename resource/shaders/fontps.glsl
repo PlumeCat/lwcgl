@@ -10,8 +10,8 @@ void main()
 {
     vec4 samp = texture(diffuseMap, vTex);
 
-    if (samp.r < 0.25)
+    if (samp.r < 0.5)
         discard;
 
-    oCol.rgba = samp.rgbr;
+    oCol = samp * vCol;
 }

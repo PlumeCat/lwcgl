@@ -2,6 +2,7 @@
 #define _CUBE_MESH_H
 
 #include "../definitions.h"
+#include "../xml/src/xml.h"
 #include "mesh.h"
 
 struct MeshSubset
@@ -81,14 +82,11 @@ struct Mesh
     }
 };
 
-
-class MeshManager
+struct Skeleton
 {
-    Mesh* getMesh(const string& fname)
-    {
-        return nullptr;
-    }
+    vector<Skeleton*> children;
 };
+
 class MeshBuilder
 {
     vector<float3> vertices;
@@ -102,7 +100,7 @@ public:
     {
         clear();
     }
-    void addGeometry(const float3* vert, const float3* norm, const float2* tex, const ushort* ind, int numvert, int numind, int materialId=0)
+    void geometry(const float3* vert, const float3* norm, const float2* tex, const ushort* ind, int numvert, int numind, int materialId=0)
     {
         // create new subset
         subsets.push_back({ indices.size(), numind, materialId });
@@ -123,7 +121,7 @@ public:
         }
 
     }
-    void addSphere(const float3& center, float radius, int sectors, int rings, int materialId=0)
+    void sphere(const float3& center, float radius, int sectors, int rings, int materialId=0)
     {
         int numVertices = sectors * (rings+1);
         int numIndices = sectors * rings * 6;
@@ -165,14 +163,14 @@ public:
             }
         }
 
-        addGeometry(vertices, normals, texcoords, indices, numVertices, numIndices, materialId);
+        geometry(vertices, normals, texcoords, indices, numVertices, numIndices, materialId);
 
         delete[] vertices;
         delete[] normals;
         delete[] texcoords;
         delete[] indices;
     }
-    void addBox(const float3& min, const float3& max, const float2& tmin, const float2& tmax, int materialId=0)
+    void box(const float3& min, const float3& max, const float2& tmin, const float2& tmax, int materialId=0)
     {
         float3 vert[] = {
 			// left
@@ -236,7 +234,49 @@ public:
 			20,21,22,21,23,22,
 		};
 
-		addGeometry(vert, norm, tex, ind, 24, 36, materialId);
+		geometry(vert, norm, tex, ind, 24, 36, materialId);
+    }
+    void prism(const vector<float3>& points, const float3& origin, const float3& extr, const float2& tmin, const float2& tmax)
+    {
+        // "points" must be vertices of a convex polygon
+        // TODO: triangulate with ear clipping (allows concavities)
+        // TODO: remove degenerate/interior points, etc (?)
+
+        // the prism is composed of 2 "faces" (convex N-gon) and a "ring" of N quads joining them
+        // for the 2 faces:
+        //      2N vertices (1 vertex per point per face)
+        //      2N-2 triangles = 6(N-2) indices
+        // for the ring:
+        //      4N vertices (2 vertices per quad, 2 quads per point)
+        //      6N indices (6 indices per quad)
+        // total:
+        //      6N vertices
+        //      12N-12 indices
+
+        float3* vertices = new float3[points.size() * 6];
+        float3* normals = new float3[points.size() * 6];
+        float2* texcoords = new float2[points.size() * 6];
+        ushort* indices = new ushort[points.size() * 12 - 12];
+
+        for (int i = 0; i < points.size(); i++)
+        {
+            // vertices for top "face"
+            // vertices for bottom "face"
+        }
+
+
+        // vertices for ring
+        
+        // indices for top "face"
+
+        // indices for bottom "face" (reversed?)
+
+        // indcices for ring
+
+        delete[] vertices;
+        delete[] indices;
+        delete[] normals;
+        delete[] texcoords;
     }
     Mesh* end(const vector<VertexAttr>& attrs)
     {
@@ -257,6 +297,68 @@ public:
         texcoords.clear();
         indices.clear();
         subsets.clear();
+    }
+};
+
+
+class MeshManager
+{
+    string baseDir;
+
+    map<string, Mesh*> meshes;
+    map<string, Skeleton*> skeletons;
+
+    void loadMesh(const string& fname)
+    {
+        try
+        {
+            Mesh* mesh = nullptr;
+            Skeleton* skeleton = nullptr;
+            
+            xml::Element document;
+            xml::load(baseDir + fname, document);
+
+            // do things to doc... terrible things...
+
+            meshes[fname] = mesh;
+            skeletons[fname] = skeleton;
+        }
+        catch (const exception& e)
+        {
+            cout << "   failed to load: " << fname << "(" << e.what() << ")" << endl;
+        }
+    }
+
+public:
+    MeshManager(const string& dir=string(RESOURCE_BASE)+"/meshes") : baseDir(dir) {}
+    Mesh* getMesh(const string& fname)
+    {
+        cout << "loading mesh: " << fname << endl;
+
+        auto mesh = meshes.find(fname);
+        if (mesh == meshes.end())
+        {
+            loadMesh(fname);
+            return meshes[fname];
+        }
+        else
+        {
+            cout << "    using cache" << endl;
+        }
+    }
+    Skeleton* getSkeleton(const string& fname)
+    {
+        cout << "loading skeleton: " << fname << endl;
+        auto skeleton = skeletons.find(fname);
+        if (skeleton == skeletons.end())
+        {
+            loadMesh(fname);
+            return skeletons[fname];
+        }
+        else
+        {
+            cout << "    using cache" << endl;
+        }
     }
 };
 

@@ -15,6 +15,9 @@
         "string": "cpp",
         "stdexcept": "cpp",
         "__tree": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "limits": "cpp"
     }
 }

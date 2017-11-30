@@ -1,6 +1,48 @@
 #ifndef _CUBE_GAME_H
 #define _CUBE_GAME_H
 
+
+class Config
+{
+    map<string, string> settings;
+    friend class Game;
+    
+    Config(const Config&) = delete;
+    Config(Config&&) = delete;
+    ~Config() {}
+    Config& operator = (const Config&) = delete;
+    Config& operator = (Config&&) = delete;
+
+public:
+    Config(const string& fname)
+    {
+        vector<string> lines;
+        readTextFile(fname, lines);
+
+        cout << "Reading config file" << lines.size() << endl;
+
+        for (auto& line : lines)
+        {
+            auto eq = line.find('=');
+            if (eq == string::npos)
+                continue;
+
+            string before = strip(line.substr(0, eq));
+            string after = strip(line.substr(eq+1, line.size()));
+
+            cout << "CONFIG: {" + before + "} = {" + after + "}" << endl;
+
+            settings[before] = after;
+
+        }
+    }
+    string get(const string& key, const string& def)
+    {
+        auto iter = settings.find(key);
+        return (iter == settings.end()) ? def : iter->second;
+    }
+};
+
 class Input
 {
     friend class Game;
@@ -36,12 +78,16 @@ public:
 };
 
 
+#include "gamestate.h"
+
 class Game
 {
     GLFWwindow* window = nullptr;
     int windowWidth = 0;
     int windowHeight = 0;
     bool shouldExit = false;
+    int devicePixelRatio = 2;
+    GameState* currentState = nullptr;
 
     int initWindow()
     {
@@ -59,7 +105,11 @@ class Game
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // TODO: disable this
 
-        window = glfwCreateWindow(1280, 720, "Cube", nullptr, nullptr);
+        // load graphics options file
+        int width = atoi(config->get("display_width", "1280").c_str());
+        int height = atoi(config->get("display_height", "720").c_str());
+
+        window = glfwCreateWindow(width, height, "Cube", nullptr, nullptr);
         if (!window)
         {
             glfwTerminate();
@@ -76,14 +126,21 @@ class Game
         glfwMakeContextCurrent(window);
         glewInit();
 
+        GLint dims[4];
+        glGetIntegerv(GL_VIEWPORT, dims);
+
+        cout << "Display: " << dims[2] << "x" << dims[3] << endl;
         cout << "Renderer: " << glGetString(GL_RENDERER) << endl;
         cout << "Version: " << glGetString(GL_VERSION) << endl;
         cout << "Shader: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
+        glDisable(GL_CULL_FACE);
+        
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
         glDepthFunc(GL_LESS);
 
         return 1;
@@ -107,34 +164,23 @@ class Game
         glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y) {
             auto game = (Game*)glfwGetWindowUserPointer(window);
             game->input.newMousePos.x = x;
-            game->input.newMousePos.y = (float)game->windowHeight - y;
+            game->input.newMousePos.y = y;
+            // game->input.newMousePos.x = min(max(0, game->input.newMousePos.x), game->windowWidth);
+            // game->input.newMousePos.y = min(max(0, game->input.newMousePos.y), game->windowWidth);
         });
         glfwSetScrollCallback(window, [](GLFWwindow* window, double xscr, double yscr) {
             auto game = (Game*)glfwGetWindowUserPointer(window);
             game->input.newScroll.x = xscr;
             game->input.newScroll.y = yscr;
         });
+        
+        // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         return 1;
     }
 
 protected:
     GLFWwindow* getWindow() { return window; }
-    void exitGame()
-    {
-        shouldExit = true;
-    }
-
-public:
-    Input input;
-    ShaderManager* shaders = nullptr;
-    TextureManager* textures = nullptr;
-    MeshManager* meshes = nullptr;
-
-    virtual void init() = 0;
-    virtual void update() = 0;
-    virtual void render() = 0;
-    virtual void close() = 0;
 
     void logGlError()
     {
@@ -163,7 +209,7 @@ public:
         }
     }
 
-    int run()
+    int init()
     {
         if (!initWindow())
             return 1;
@@ -174,41 +220,92 @@ public:
 
         glfwSetErrorCallback([](int err, const char* msg) {
             cout << "GLFW Error: " << err << " - " << msg << endl;
-            exit(5);
+            ::exit(5);
         });
 
         shaders = new ShaderManager();
         textures = new TextureManager();
         meshes = new MeshManager();
 
-        init();
         logGlError();
         cout << "starting main loop" << endl;
 
-        while (!glfwWindowShouldClose(window) && !shouldExit)
-        {
-            input.update();
-            update();
+        currentState->init();
+    }
+    void update()
+    {
+        input.update();
+        currentState->update();
+    }
+    void render()
+    {
+        glClearColor(0.25, 0.4, 0.8, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        currentState->render();
 
-            glClearColor(0.25, 0.4, 0.8, 0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            render();
-            
-            glfwSwapBuffers(window);
-
-            logGlError();
-
-        }
-
-        close();
+        glfwSwapBuffers(window);
+        logGlError();
+    }
+    void close()
+    {
+        currentState->close();
+        delete currentState;
 
         delete meshes;
         delete textures;
         delete shaders;
-
+        delete config;
         glfwDestroyWindow(window);
         glfwTerminate();
+    }
+
+    void exitGame()
+    {
+        shouldExit = true;
+    }
+
+public:
+    Input input;
+    ShaderManager* shaders = nullptr;
+    TextureManager* textures = nullptr;
+    MeshManager* meshes = nullptr;
+    Config* config = nullptr;
+
+    void exit()
+    {
+        shouldExit = true;
+    }
+
+    void setState(GameState* state)
+    {
+        currentState->close();
+        delete currentState;
+        
+        currentState = state;
+        currentState->game = this;
+        currentState->init();
+    }
+
+    int run(GameState* state)
+    {
+        config = new Config(string(RESOURCE_BASE) + "/options.txt");
+
+        currentState = state;
+        currentState->game = this;
+        
+        if (!init())
+            return 1;
+
+        while (!glfwWindowShouldClose(window) && !shouldExit)
+        {
+            update();
+            // TODO: separate thread
+            render();
+
+        }
+
+        close();
 
         return 0;
     }

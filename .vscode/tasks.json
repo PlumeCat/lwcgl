@@ -4,16 +4,48 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Make OSX",
+            "label": "OSX Build Debug",
             "type": "shell",
-            "command": "make",
+            "command": "bash",
             "args": [
-                "build_debug"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+
+                "-c",
+                "\"", // quote the entire command
+                
+                    // clean 
+                    "rm -r build/debug &&",
+                    "mkdir build/debug &&",
+                    
+                    "clang++",
+                        "src/main.cpp",
+                        "-o build/debug/cubes",
+                        
+                        "-std=c++14",
+                        "-m32",
+                        "-arch i386",
+                        "-Wall",
+                        "-g",
+                        
+                        "-I/user/local/include",
+                        "-I./",
+                        
+                        "-L/usr/local/lib",
+                        "-L./",
+                        "-lglfw3",
+                        "-lSOIL",
+                        "-lGLEW",
+                        "-fms-extensions",
+                        "-framework Cocoa",
+                        "-framework OpenGL",
+                        "-framework IOKit",
+                        "-framework CoreVideo",
+
+                        "-fms-extensions",
+
+                        "-D_DEBUG=1",
+
+                "\"" // end quote
+            ]
         }
     ]
 }

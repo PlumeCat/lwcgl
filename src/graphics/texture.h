@@ -33,6 +33,14 @@ struct SpriteFont
     SpriteChar chars[256];
 };
 
+void getTextureSize(GLuint tex, int& w, int& h)
+{
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 class TextureManager
 {
     string baseDir;
@@ -41,14 +49,49 @@ class TextureManager
     map<string, Texture*> cubetextures;
     map<string, SpriteFont*> fonts;
 
-    void getTextureSize(GLuint tex, int& w, int& h)
+    void loadFontChars(const string& fname, SpriteChar (&chars)[256])
     {
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w);
-        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+        cout << "    loading chars... ";
 
+        vector<string> lines;
+        readTextFile(fname, lines);
+        for (int i = 0; i < lines.size(); i++)
+        {
+            const string& line = lines[i];
+
+            string keys[6] = { "ch", "code", "l", "t", "w", "h" };
+            string values[6] = { "", "", "", "", "", "" };
+            auto scanpos = string::size_type(0);
+
+            for (int j = 0; j < arraylen(keys); j++)
+            {
+                auto start = line.find(keys[j]+"=", scanpos);
+                auto end = (j!=arraylen(keys)-1) ? line.find(" ", start+keys[j].size()+1) : line.size();
+                if (start == string::npos || end == string::npos)
+                {
+                    cout << "    invalid line: (" << i << ") " << line << endl;
+                    break;
+                }
+                else
+                {
+                    start += keys[j].size()+1;
+                    values[j] = line.substr(start, end-start);
+                    // cout << "(" << values[j] << ")";
+                    scanpos = end + 1;
+                }
+            }
+
+            int ch = atoi(values[0].c_str());
+            int code = atoi(values[1].c_str());
+            chars[code].ch = code;
+            stringstream(values[2]) >> chars[code].left;
+            stringstream(values[3]) >> chars[code].top;
+            stringstream(values[4]) >> chars[code].width;
+            stringstream(values[5]) >> chars[code].height;
+        }
+
+        cout << "success" << endl;
+    }
     GLuint loadTexture(const string& fname)
     {
         cout << "    loading texture from file: " << fname << "...";
@@ -61,6 +104,10 @@ class TextureManager
 
         if (tex)
         {
+            glBindTexture( GL_TEXTURE_2D, tex);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glBindTexture( GL_TEXTURE_2D, 0);            
             cout << "success" << endl;
         }
         else
@@ -120,53 +167,6 @@ public:
             cout << "    using cached" << endl;
             return tex->second;
         }
-    }
-    void loadFontChars(const string& fname, SpriteChar (&chars)[256])
-    {
-        cout << "    loading chars... ";
-
-        vector<string> lines;
-        readTextFile(fname, lines);
-        for (int i = 0; i < lines.size(); i++)
-        {
-            const string& line = lines[i];
-
-            string keys[6] = { "ch", "code", "l", "t", "w", "h" };
-            string values[6] = { "", "", "", "", "", "" };
-            auto scanpos = string::size_type(0);
-
-            for (int j = 0; j < arraylen(keys); j++)
-            {
-                auto start = line.find(keys[j]+"=", scanpos);
-                auto end = (j!=arraylen(keys)-1) ? line.find(" ", start+keys[j].size()+1) : line.size();
-                if (start == string::npos || end == string::npos)
-                {
-                    cout << "    invalid line: (" << i << ") " << line << endl;
-                    break;
-                }
-                else
-                {
-                    start += keys[j].size()+1;
-                    values[j] = line.substr(start, end-start);
-                    // cout << "(" << values[j] << ")";
-                    scanpos = end + 1;
-                }
-            }
-
-            int ch = atoi(values[0].c_str());
-            int code = atoi(values[1].c_str());
-            chars[code].ch = code;
-            stringstream(values[2]) >> chars[code].left;
-            stringstream(values[3]) >> chars[code].top;
-            stringstream(values[4]) >> chars[code].width;
-            stringstream(values[5]) >> chars[code].height;
-            // chars[code].left   = atoi(values[2].c_str());
-            // chars[code].top    = atoi(values[3].c_str());
-            // chars[code].width  = atoi(values[4].c_str());
-            // chars[code].height = atoi(values[5].c_str());
-        }
-
-        cout << "success" << endl;
     }
     SpriteFont* getFont(const string& fname)
     {
