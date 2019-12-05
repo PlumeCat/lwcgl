@@ -32,25 +32,3 @@ lightweight C++ game library
 quick sample that shows how to derive `Game` and add your own gameplay
 
 ![image not found :(](https://github.com/jamesmjdm/lwcgl/blob/master/screeny.png)
-
-### dungeon game
-more complex sample
-
-### dogfight game
-
-more complex sample with complicated game state
-
-#### primary weapons
-flak cannon
-gatling gun
-standard guns
-railgun
-
-#### secondary weapons
-swarm missiles
-
-#### abilities
-afterburner
-shield
-thrust vectoring
-stealth
