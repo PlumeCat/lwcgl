@@ -1,51 +1,42 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "OSX Build Debug",
+            "label": "make",
             "type": "shell",
-            "command": "bash",
-            "args": [
-
-                "-c",
-                "\"", // quote the entire command
-                
-                    // clean 
-                    "rm -r build/debug &&",
-                    "mkdir build/debug &&",
-                    
-                    "clang++",
-                        "src/main.cpp",
-                        "-o build/debug/cubes",
-                        
-                        "-std=c++14",
-                        "-m32",
-                        "-arch i386",
-                        "-Wall",
-                        "-g",
-                        
-                        "-I/user/local/include",
-                        "-I./",
-                        
-                        "-L/usr/local/lib",
-                        "-L./",
-                        "-lglfw3",
-                        "-lSOIL",
-                        "-lGLEW",
-                        "-fms-extensions",
-                        "-framework Cocoa",
-                        "-framework OpenGL",
-                        "-framework IOKit",
-                        "-framework CoreVideo",
-
-                        "-fms-extensions",
-
-                        "-D_DEBUG=1",
-
-                "\"" // end quote
-            ]
+            "command": "make",
+            "problemMatcher": "$gcc",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "cmake DEBUG",
+            "type": "shell",
+            "command": "cmake .. -G 'Unix Makefiles'",
+            "options": {
+                "cwd": "build",
+                "env": {
+                    "CMAKE_BUILD_TYPE": "Debug"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "cmake RELEASE",
+            "type": "shell",
+            "command": "cmake .. -G 'Unix Makefiles'",
+            "options": {
+                "cwd": "build",
+                "env": {
+                    "CMAKE_BUILD_TYPE": "Release"
+                }
+            },
+            "problemMatcher": []
         }
     ]
 }

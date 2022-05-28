@@ -5,14 +5,15 @@
 #include <fstream>
 #include <cstdint>
 
-#include <GL/glew.h>
+#define GLFW_INCLUDE_NONE
+#include "../dep/glad.h"
 #include <GLFW/glfw3.h>
 
 typedef uint32_t uint;
 typedef uint16_t ushort;
 typedef uint8_t uchar, byte;
 
-#define pi 3.1415926535f
+static const float pi = 3.1415926535f;
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) < (b)) ? (a) : (b))
 #define random() ((double)rand() / (double)RAND_MAX)

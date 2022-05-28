@@ -1,7 +1,8 @@
 #ifndef _CUBE_TEXTURE_H
 #define _CUBE_TEXTURE_H
 
-#include <SOIL.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include "../definitions.h"
 
 struct Texture
@@ -95,12 +96,21 @@ class TextureManager
     GLuint loadTexture(const string& fname)
     {
         cout << "    loading texture from file: " << fname << "...";
-        GLuint tex = SOIL_load_OGL_texture(
-            fname.c_str(),
-            SOIL_LOAD_AUTO,
-            SOIL_CREATE_NEW_ID,
-            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB
-        );
+        // GLuint tex = SOIL_load_OGL_texture(
+        //     fname.c_str(),
+        //     SOIL_LOAD_AUTO,
+        //     SOIL_CREATE_NEW_ID,
+        //     SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB
+        // );
+        auto x = 0;
+        auto y = 0;
+        auto c = 0;
+        GLuint tex;
+        auto data = stbi_load(fname.c_str(), &x, &y, &c, 4);
+        glGenTextures(1, &tex);
+        glBindTexture(GL_TEXTURE_2D, tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
         if (tex)
         {

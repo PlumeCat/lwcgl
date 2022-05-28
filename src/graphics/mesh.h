@@ -2,7 +2,7 @@
 #define _CUBE_MESH_H
 
 #include "../definitions.h"
-#include "../xml/src/xml.h"
+// #include "../xml/src/xml.h"
 #include "mesh.h"
 
 struct MeshSubset
@@ -103,7 +103,7 @@ public:
     void geometry(const float3* vert, const float3* norm, const float2* tex, const ushort* ind, int numvert, int numind, int materialId=0)
     {
         // create new subset
-        subsets.push_back({ indices.size(), numind, materialId });
+        subsets.push_back({ (uint)indices.size(), (uint)numind, (uint)materialId });
 
         // add indices, offset by previous number of vertices
         int v = vertices.size();
@@ -315,8 +315,8 @@ class MeshManager
             Mesh* mesh = nullptr;
             Skeleton* skeleton = nullptr;
             
-            xml::Element document;
-            xml::load(baseDir + fname, document);
+            // xml::Element document;
+            // xml::load(baseDir + fname, document);
 
             // do things to doc... terrible things...
 

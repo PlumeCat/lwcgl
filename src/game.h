@@ -124,7 +124,8 @@ class Game
     int initGraphics()
     {
         glfwMakeContextCurrent(window);
-        glewInit();
+        // glewInit();
+        gladLoadGL(glfwGetProcAddress);
 
         GLint dims[4];
         glGetIntegerv(GL_VIEWPORT, dims);
@@ -197,8 +198,8 @@ protected:
                     case GL_INVALID_OPERATION: msg = "invalid operation"; break;
                     case GL_INVALID_FRAMEBUFFER_OPERATION: msg = "invalid fbo op"; break;
                     case GL_OUT_OF_MEMORY: msg = "oom"; break;
-                    case GL_STACK_OVERFLOW: msg = "stackoverflow"; break;
-                    case GL_STACK_UNDERFLOW: msg = "stack underflow"; break;
+                    // case GL_STACK_OVERFLOW: msg = "stackoverflow"; break;
+                    // case GL_STACK_UNDERFLOW: msg = "stack underflow"; break;
                 }
                 cout << "get error: " << msg << endl;
             }

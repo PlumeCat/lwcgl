@@ -23,6 +23,9 @@ using namespace std;
 #include "game.h"
 #include "collision.h"
 
+#define GLAD_GL_IMPLEMENTATION
+#include <glad.h>
+
 #define __openbrace__ {
 #define __closebrace__ }
 #define DEFINE_STATE_BEGIN(cls) class cls : public GameState __openbrace__ void init(); void update(); void render(); void close();
@@ -274,9 +277,6 @@ void PlaneGame::render()
     sprite->drawText(font, str.str(), float2(0, 0), float2(0.5, 0.5));
 }
 void PlaneGame::close() {}
-
-
-
 
 
 int main()
