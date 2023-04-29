@@ -1,0 +1,13 @@
+"bullet.tack"
+
+export fn check_bullet_spaceship(s, b) {
+    let dx = b.x - s.x
+    let dy = b.y - s.y
+    let r = 32
+
+    if dx*dx + dy*dy < r * r {
+        return true
+    }
+
+    return false
+}

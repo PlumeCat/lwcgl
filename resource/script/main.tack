@@ -1,0 +1,7 @@
+"main.tack"
+
+dofile("space_background.tack")
+dofile("bullet.tack")
+dofile("spaceship.tack")
+dofile("planet.tack")
+dofile("space_game.tack")

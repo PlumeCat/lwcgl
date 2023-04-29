@@ -1,0 +1,12 @@
+"space_background.tack"
+
+let T = 0
+let space_shader = load_shader("space")
+
+export fn draw_space_background() {
+    " draw space "
+    T = T + 0.25
+    set_shader(space_shader)
+    set_shader_float("T", T)
+    draw_sprite_part(0, 0, 0, 0, Game.display_width, Game.display_height, 0xffff00ff)
+}

@@ -1,0 +1,257 @@
+
+
+let block_sprite = [
+    load_sprite("puzzle/element_blue_rectangle"),
+    load_sprite("puzzle/element_purple_rectangle"),
+    load_sprite("puzzle/element_green_rectangle"),
+    load_sprite("puzzle/element_grey_rectangle"),
+    load_sprite("puzzle/element_red_rectangle"),
+    load_sprite("puzzle/element_yellow_rectangle")
+]
+
+let powerups = [
+    "shield",
+    "extra_life",
+
+    "paddle_sticky",
+    "paddle_big",
+    "paddle_laser",
+    "paddle_small",
+
+    "ball_multiply",
+    "ball_powerful",
+    "ball_explosive",
+    "ball_fast",
+    "ball_slow",
+
+    "blocks_invisible",
+    "blocks_reinforced"
+]
+
+const trail_size = 50
+let font = load_font("Arial-40")
+let font2 = load_font("Verdana-20")
+let paddle_sprite = load_sprite("puzzle/paddleRed")
+let ball_sprite2 = load_sprite("puzzle/ballGrey")
+let ball_sprite = load_sprite("puzzle/ballBlue")
+
+let game_state = 0
+let blocks = []
+let paddle_x = 640
+let paddle_y = 704
+let lives = 0
+
+let ball_x = 640
+let ball_y = 676
+let ball_px = []
+let ball_py = []
+
+let ball_vx = 0
+let ball_vy = 0
+let ball_sticky = true
+let score = 0
+
+fn start_game() {
+    score = 0
+    paddle_x = 640
+    lives = 3
+    ball_sticky = true
+    ball_vx = 0
+    ball_vy = 0
+
+    blocks = []
+    for i in 0, 19 {
+        for j in 0, 8 {
+            blocks << {
+                x = i * 64 + 64,
+                y = j * 32 + 32,
+                sprite = random() * 6
+            }
+        }
+    }
+
+}
+fn update_ball() {
+    for i in 0, 4 {
+        ball_px << ball_x + ball_vx * i * 0.25
+        ball_py << ball_y + ball_vy * i * 0.25
+    }
+
+    ball_x = ball_x + ball_vx
+    ball_y = ball_y + ball_vy
+    if ball_x > 1280 - 11 {
+        ball_x = 1280 - 11
+        ball_vx = 0-ball_vx
+    }
+    if ball_x < 11 {
+        ball_x = 11
+        ball_vx = 0-ball_vx
+    }
+    if ball_y < 11 {
+        ball_y = 11
+        ball_vy = 0-ball_vy
+    }
+    if ball_y > 720 - 11 {
+        lives = lives - 1
+        ball_sticky = true
+        ball_vx = 0
+        ball_vy = 0
+    }
+
+    if #ball_px > trail_size {
+        let ball_px2 = []
+        let ball_py2 = []
+        for i in #ball_px - trail_size, #ball_px {
+            ball_px2 << ball_px[i]
+            ball_py2 << ball_py[i]
+        }
+        ball_px = ball_px2
+        ball_py = ball_py2
+    }
+}
+fn update_blocks() {
+    let new_blocks = []
+    for b in blocks {
+        let dx = ball_x - b.x
+        let dy = ball_y - b.y
+        let rx = 32 + 11
+        let ry = 16 + 11
+        let collision = false
+        if dx*dx < rx*rx {
+            if dy*dy < ry*ry {
+                collision = true
+                if dy < 0 {
+                    ball_vy = 0-ball_vy
+                } else if dy > 0 {
+                    ball_vy = 0-ball_vy
+                } else {
+                    ball_vx = 0-ball_vx
+                }
+
+            }
+        }
+
+        if collision {
+            score = score + 1
+        } else {
+            new_blocks << b
+        }
+    }
+
+    blocks = new_blocks
+}
+fn update_paddle(a, b, c) {
+    let paddle_speed = 10
+    "if key_down(Keys.Left) {
+            if paddle_x > 50 {
+                paddle_x = paddle_x - 10
+                paddle_x =
+            }
+        }
+        if key_down(Keys.Right) {
+            if paddle_x < 1230 {
+                paddle_x = paddle_x + 10
+            }
+        }"
+
+    paddle_x = Mouse.x
+    if paddle_x > 1230 { paddle_x = 1230 }
+    if paddle_x < 50 { paddle_x = 50 }
+
+
+    if ball_sticky {
+        ball_x = paddle_x
+        ball_y = 676
+        if key_pressed(Keys.Space) {
+            ball_sticky = false
+            ball_vx = 0
+            ball_vy = 0-10
+        }
+    } else {
+        " check collision with ball "
+        let dx = ball_x - paddle_x
+        let dy = ball_y - paddle_y
+        let rx = 52 + 11
+        let ry = 12 + 11
+        if  dx < rx and
+            dx > (0-rx) and
+            dy < ry and
+            dy > (0-ry) {
+            ball_vy = 0-ball_vy
+            ball_vx = dx * 0.2
+        }
+    }
+}
+
+export fn on_init() {}
+export fn on_frame() {
+    if game_state == 0 {
+        if key_pressed(Keys.Escape) {
+            exit()
+        }
+        if key_pressed(Keys.Enter) {
+            game_state = 1
+            start_game()
+        }
+
+        draw_text(font, "BALL GAME", 100, 100)
+        draw_text(font2, "Enter - start", 100, 140)
+        draw_text(font2, "Esc - exit", 100, 160)
+
+        draw_text(font2, "left/right: move paddle", 100, 300, 0xffaaaaaa)
+        draw_text(font2, "space: launch ball", 100, 320, 0xffaaaaaa)
+
+    } else if game_state == 1 {
+        if key_pressed(Keys.Escape) {
+            game_state = 0
+        }
+
+
+        update_paddle()
+        update_ball()
+        update_blocks()
+
+        if lives == 0 {
+            game_state = 2
+        }
+        if #blocks == 0 {
+            game_state = 3
+        }
+
+        draw_sprite(paddle_sprite, paddle_x - 52, paddle_y - 12)
+
+        for i in 0, #ball_px {
+            let scale = i / #ball_px
+            draw_sprite_ext(ball_sprite2, ball_px[i], ball_py[i], 11, 11, 0, scale, scale, 0xffff8877)
+        }
+        draw_sprite(ball_sprite, ball_x - 11, ball_y - 11)
+
+        for b in blocks {
+            draw_sprite(block_sprite[b.sprite], b.x - 32, b.y - 16)
+        }
+
+        for i in 0, lives {
+            draw_sprite(ball_sprite, 10 + i * 30, 10)
+        }
+
+        draw_text(font2, "Score: " + tostring(score), 10, 690, 0xffaaaaaa)
+
+    } else if game_state == 2 {
+        if key_pressed(Keys.Enter) {
+            game_state = 0
+        }
+        draw_text(font, "game over :(", 100, 100, 0xff0000ff)
+        draw_text(font2, "Enter: return", 100, 150)
+    } else if game_state == 3 {
+        if key_pressed(Keys.Enter) {
+            game_state = 0
+        }
+        draw_text(font, "you win!" + ":)", 100, 100, 0xff00ff00)
+        draw_text(font2, "score: " + tostring(score), 100, 180)
+        draw_text(font2, "Enter: return", 100, 150)
+    }
+
+}
+
+export fn on_exit() {}
+

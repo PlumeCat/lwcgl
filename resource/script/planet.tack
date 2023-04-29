@@ -1,0 +1,38 @@
+print("HELLO PLANET")
+
+let planet_shader = load_shader("planet")
+
+let planet_light = []
+"for i in 0, 11 {"
+for i in 0, 1 {
+    planet_light << load_sprite("planet/light" + tostring(i))
+}
+let planet_noise = []
+"for i in 0, 28 {"
+for i in 0, 1 {
+    let j = tostring(i)
+    if i < 10 { j = "0" + j }
+    planet_noise << load_sprite("planet/noise" + j)
+}
+
+let PN = 0
+let PL = 0
+let PC1 = { r = random(), g = random(), b = random(), a = random() }
+let PC2 = { r = random(), g = random(), b = random(), a = random() }
+
+export fn draw_planet() {
+    if key_pressed(Keys.Space) {
+        PN = random() * #planet_noise
+        PL = random() * #planet_light
+        PC1 = { r = random(), g = random(), b = random() }
+        PC2 = { r = random(), g = random(), b = random() }
+    }
+
+    " draw planet "
+    set_shader(planet_shader)
+    set_sprite(planet_light[PL])
+    set_shader_texture(1, planet_noise[PN])
+    set_shader_vec4("Color1", PC1.r, PC1.g, PC1.b, 1)
+    set_shader_vec4("Color2", PC2.r, PC2.g, PC2.b, 1)
+    draw_sprite_ext(Game.display_width / 2, Game.display_height / 2, 512, 512, 0, 0.25, 0.25)
+}

@@ -1,0 +1,52 @@
+let font1 = load_font("Sylfaen-30")
+
+let player1 = Spaceship()
+let player2 = Spaceship()
+let bullets = []
+
+player1.color = 0xffff8888
+
+player1.x = Game.display_width - player1.x
+player1.angle = pi / 2
+
+player2.weapon_sound = "sfx_wpn_laser5.wav"
+player2.engine_sound = load_sound("loop_engine_2.wav")
+player2.angle = 0 - pi / 2
+player2.effect = "effect_yellow.png"
+player2.left_key = Keys.A
+player2.right_key = Keys.D
+player2.fire_key = Keys.S
+player2.up_key = Keys.W
+player2.color = 0xff8888ff
+
+fn check_collisions() {}
+
+export fn on_init() {
+    "set_fullscreen(true)"
+}
+export fn on_frame() {
+    if key_pressed(Keys.Escape) {
+        exit()
+    }
+
+    player1.update()
+    player2.update()
+
+    check_collisions()
+
+    draw_space_background()
+    "draw_planet()"
+
+    " draw spaceships "
+    set_shader(null)
+    player1.draw()
+    player2.draw()
+
+    set_font(null)
+    draw_text("x: " + tostring(player1.x), 100, 200)
+    draw_text("y: " + tostring(player1.y), 100, 230)
+    draw_text("y: " + tostring(spaceship_sprite_names[player1.sprite]), 100, 260)
+}
+export fn on_exit() {}
+
+

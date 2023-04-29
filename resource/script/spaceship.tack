@@ -1,0 +1,117 @@
+print("spaceship.tack")
+
+let spaceship_sprite = load_sprite("simple_space")
+
+export let spaceship_sprite_names = [
+    "ship_A.png",
+    "ship_B.png",
+    "ship_C.png",
+    "ship_D.png",
+    "ship_E.png",
+    "ship_F.png",
+    "ship_G.png",
+    "ship_H.png",
+    "ship_I.png",
+    "ship_J.png",
+    "ship_K.png",
+    "ship_L.png",
+    "station_A.png",
+    "station_B.png",
+    "station_C.png",
+    "satellite_A.png",
+    "satellite_B.png",
+    "satellite_C.png",
+    "satellite_D.png",
+    "enemy_A.png",
+    "enemy_B.png",
+    "enemy_C.png",
+    "enemy_D.png",
+    "enemy_E.png"
+]
+
+export fn Spaceship() {
+    let self = {
+        x = 500,
+        y = 500,
+        vx = 0,
+        vy = 0,
+        ax = 0,
+        ay = 0,
+        angle = 0,
+
+        impulse = 0.016,
+        turn_speed = 0.05,
+
+        up_key = Keys.Up,
+        left_key = Keys.Left,
+        right_key = Keys.Right,
+        fire_key = Keys.Down,
+
+        color = 0xffffffff,
+        sprite = random() * #spaceship_sprite_names,
+        effect = "effect_purple.png",
+
+        engine_sound = load_sound("loop_engine_1.wav"),
+        weapon_sound = "sfx_wpn_laser6.wav",
+
+        thrust = false
+    }
+
+    self.update = fn() {
+        self.ax = 0
+        self.ay = 0
+        if key_pressed(self.up_key) {
+            self.thrust = true
+            start_sound(self.engine_sound, true)
+        }
+        if key_released(self.up_key) {
+            self.thrust = false
+            stop_sound(self.engine_sound)
+            self.sprite = (self.sprite - 1) % #spaceship_sprite_names
+        }
+        if key_pressed(self.fire_key) {
+            play_sound(self.weapon_sound, false)
+            "self.sprite = random() * #spaceship_sprite_names"
+            self.sprite = (self.sprite + 1) % #spaceship_sprite_names
+        }
+
+        if key_down(self.left_key) {
+            self.angle = self.angle + self.turn_speed
+        }
+        if key_down(self.right_key) {
+            self.angle = self.angle - self.turn_speed
+        }
+
+
+        if self.thrust {
+            self.ax = cos(self.angle) * self.impulse
+            self.ay = 0-sin(self.angle) * self.impulse
+
+            self.thrust = true
+
+            self.vx = self.vx * 0.999
+            self.vy = self.vy * 0.999
+        }
+        self.vx = self.vx + self.ax
+        self.vy = self.vy + self.ay
+        self.x = self.x + self.vx
+        self.y = self.y + self.vy
+
+        if self.x < 0 or self.x > Game.display_width {
+            self.x = Game.display_width - self.x
+        }
+        if self.y < 0 or self.y > Game.display_height {
+            self.y = Game.display_height - self.y
+        }
+    }
+
+    self.draw = fn() {
+        set_sprite(spaceship_sprite)
+        if self.thrust {
+            draw_sprite_sheet(self.effect, self.x, self.y, 16, 0-24, self.angle - pi / 2, 0.5, 0.5, 0xffffffff)
+        }
+        draw_sprite_sheet(spaceship_sprite_names[self.sprite], self.x, self.y, 24, 24, self.angle - pi / 2, 1, 1, self.color)
+    }
+
+    return self
+}
