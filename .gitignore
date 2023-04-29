@@ -1,4 +1,6 @@
 /.vs/
-resource
+/resource/
+!/resource/script/
+!/resource/script/*
 /out/
 /build/
