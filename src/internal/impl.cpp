@@ -1,0 +1,4 @@
+#define GLAD_GL_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define JLIB_IMPLEMENTATION
+#include "../tge.h"
